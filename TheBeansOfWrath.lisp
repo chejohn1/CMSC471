@@ -14,3 +14,12 @@
 	  user::harvest-rate user::buy-third-bean-field
 	  user::is-singleton? user::is-multiple? user::is-empty?
 	  user::is-planted?))
+
+(defun plant-card (player card game)
+	(buy-third-bean-field (player game)))
+	
+(defun optionally-plant-card (player game)
+	(buy-third-bean-field (player game)))
+	
+(defun handle-face-up-cards (player game)
+	(buy-third-bean-field (player game)))

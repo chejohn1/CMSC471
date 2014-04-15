@@ -40,5 +40,5 @@
 	(let ((which (legal-fields-to-harvest (player-fields player))))
 		(cond ((not which)
 			(error "No legal fields to harvest"))
-		      (t (harvest player (car which) game)))
+		      (t (harvest player (cdr which) game)))
 		(car which)))

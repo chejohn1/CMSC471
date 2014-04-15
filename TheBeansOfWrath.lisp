@@ -19,7 +19,10 @@
 	(buy-third-bean-field (player game)))
 	
 (defun optionally-plant-card (player game)
-	(buy-third-bean-field (player game)))
+	(buy-third-bean-field (player game))
+	(plant-card player (car plant-card) game))
 	
 (defun handle-face-up-cards (player game)
-	(buy-third-bean-field (player game)))
+	(buy-third-bean-field (player game))
+	(plant-card player (pop (player-faceup player)) game)
+	(plant-card player (pop (player-faceup player)) game))

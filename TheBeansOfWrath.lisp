@@ -26,3 +26,10 @@
 	(buy-third-bean-field (player game))
 	(plant-card player (pop (player-faceup player)) game)
 	(plant-card player (pop (player-faceup player)) game))
+	
+(defun harvest-best-field (player game)
+	(let ((which (legal-fields-to-harvest (player-fields player))))
+		(cond ((not which)
+			(error "No legal fields to harvest"))
+		      (t (harvest player (car which) game)))
+		(car which)))

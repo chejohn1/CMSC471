@@ -23,7 +23,8 @@
 		(plant card player 1))
 	(if (and
 		(eq (player-numfields player) 3)
-		(bean-fits card (third (player-fields player)))))
+		(bean-fits card (third (player-fields player))))
+		(plant card player 2))
 	(harvest player 0 game)
 	(plant card player 0))
 	

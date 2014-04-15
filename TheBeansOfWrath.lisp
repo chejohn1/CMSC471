@@ -16,22 +16,28 @@
 	  user::is-planted?))
 
 (defun plant-card (player card game)
-	(buy-third-bean-field player game)
-	(if (bean-fits card (first (player-fields player)))
-		(plant card player 0))
-	(if (bean-fits card (second (player-fields player)))
-		(plant card player 1))
-	(if (and
-		(eq (player-numfields player) 3)
-		(bean-fits card (third (player-fields player))))
-		(plant card player 2))
-	(harvest player 0 game)
-	(plant card player 0))
-	
+        (buy-third-bean-field player game)
+        (cond
+         ((null card))
+         ((bean-fits card (first (player-fields player)))
+          (plant card player 0))
+         ((bean-fits card (first (player-fields player)))
+          (plant card player 0))
+         ((bean-fits card (second (player-fields player)))
+          (plant card player 1))
+         ((and
+           (eq (player-numfields player) 3)
+           (bean-fits card (third (player-fields player))))
+          (plant card player 2))
+         (t
+          (progn
+            (harvest player 0 game)
+            (plant card player 0)))))
+
 (defun optionally-plant-card (player game)
-	(buy-third-bean-field player game)
-	(plant-card player (car plant-card) game))
-	
+        (buy-third-bean-field player game)
+        (plant-card player (car (player-hand player)) game))
+
 (defun handle-face-up-cards (player game)
 	(buy-third-bean-field player game)
 	(plant-card player (pop (player-faceup player)) game)

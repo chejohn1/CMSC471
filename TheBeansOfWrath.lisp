@@ -16,7 +16,7 @@
 	  user::is-planted?))
 
 (defun plant-card (player card game)
-	(buy-third-bean-field (player game))
+	(buy-third-bean-field player game)
 	(if (bean-fits card (first (player-fields player)))
 		(plant card player 0))
 	(if (bean-fits card (second (player-fields player)))
@@ -28,11 +28,11 @@
 	(plant card player 0))
 	
 (defun optionally-plant-card (player game)
-	(buy-third-bean-field (player game))
+	(buy-third-bean-field player game)
 	(plant-card player (car plant-card) game))
 	
 (defun handle-face-up-cards (player game)
-	(buy-third-bean-field (player game))
+	(buy-third-bean-field player game)
 	(plant-card player (pop (player-faceup player)) game)
 	(plant-card player (pop (player-faceup player)) game))
 	

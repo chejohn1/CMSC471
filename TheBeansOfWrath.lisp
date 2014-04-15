@@ -33,4 +33,3 @@
 			(error "No legal fields to harvest"))
 		      (t (harvest player (car which) game)))
 		(car which)))
-penis

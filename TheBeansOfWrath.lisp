@@ -16,36 +16,36 @@
 	  user::is-planted?))
 
 (defun plant-card (player card game)
-        (buy-third-bean-field player game)
-        (cond
-         ((null card))
-         ((bean-fits card (first (player-fields player)))
-          (plant card player 0))
-         ((bean-fits card (first (player-fields player)))
-          (plant card player 0))
-         ((bean-fits card (second (player-fields player)))
-          (plant card player 1))
-         ((and
-           (eq (player-numfields player) 3)
-           (bean-fits card (third (player-fields player))))
-          (plant card player 2))
-         (t
-          (progn
-            (harvest player 0 game)
-            (plant card player 0)))))
+  (buy-third-bean-field player game)
+  (cond
+   ((null card))
+   ((bean-fits card (first (player-fields player)))
+    (plant card player 0))
+   ((bean-fits card (first (player-fields player)))
+    (plant card player 0))
+   ((bean-fits card (second (player-fields player)))
+    (plant card player 1))
+   ((and
+     (eq (player-numfields player) 3)
+     (bean-fits card (third (player-fields player))))
+    (plant card player 2))
+   (t
+    (progn
+      (harvest player 0 game)
+      (plant card player 0)))))
 
 (defun optionally-plant-card (player game)
-        (buy-third-bean-field player game)
-        (plant-card player (car (player-hand player)) game))
+  (buy-third-bean-field player game)
+  (plant-card player (car (player-hand player)) game))
 
 (defun handle-face-up-cards (player game)
-	(buy-third-bean-field player game)
-	(plant-card player (pop (player-faceup player)) game)
-	(plant-card player (pop (player-faceup player)) game))
+  (buy-third-bean-field player game)
+  (plant-card player (pop (player-faceup player)) game)
+  (plant-card player (pop (player-faceup player)) game))
 	
 (defun harvest-best-field (player game)
-	(let ((which (legal-fields-to-harvest (player-fields player))))
-		(cond ((not which)
-			(error "No legal fields to harvest"))
-		      (t (harvest player (cdr which) game)))
-		(car which)))
+  (let ((which (legal-fields-to-harvest (player-fields player))))
+    (cond ((not which)
+	   (error "No legal fields to harvest"))
+	  (t (harvest player (cdr which) game)))
+    (car which)))

@@ -19,16 +19,8 @@
   (buy-third-bean-field player game)
   (cond
    ((null card))
-   ((bean-fits card (first (player-fields player)))
-    (plant card player 0))
-   ((bean-fits card (first (player-fields player)))
-    (plant card player 0))
-   ((bean-fits card (second (player-fields player)))
-    (plant card player 1))
-   ((and
-     (eq (player-numfields player) 3)
-     (bean-fits card (third (player-fields player))))
-    (plant card player 2))
+   ((plant-in-occupied-field player card))
+   ((plant-in-empty-field player card))
    (t
     (progn
       (harvest player 0 game)
@@ -49,3 +41,34 @@
 	   (error "No legal fields to harvest"))
 	  (t (harvest player (cdr which) game)))
     (car which)))
+
+;;; returns true if the player has three fields, null if only two
+(defun third-field? (player)
+  (eq (player-numfields player) 3))
+
+;;; returns true if the field contains the given bean, null if not
+(defun contains-bean? (bean field)
+  (eq bean (car field)))
+
+;;; attempts to plant a card in a field that already has the given card,
+;;; returns null if it can't
+(defun plant-in-occupied-field (player card)
+  (cond
+   ((contains-bean? card (first (player-fields player)))
+    (plant card player 0))
+   ((contains-bean? card (second (player-fields player)))
+    (plant card player 1))
+   ((contains-bean? card (third (player-fields player)))
+    (plant card player 2))))
+
+;;; attempts to plant a card in an empty field, returns null if there are none
+(defun plant-in-empty-field (player card)
+  (cond
+   ((is-empty? (first (player-fields player)))
+    (plant card player 0))
+   ((is-empty? (second (player-fields player)))
+    (plant card player 1))
+   ((and
+     (third-field? player)
+     (is-empty? (third (player-fields player))))
+    (plant card player 2))))

@@ -30,10 +30,17 @@
   (buy-third-bean-field player game)
   (plant-card player (pop (player-hand player)) game))
 
+;;; plants face-up cards based on if there is already a field containing
+;;; each card in play
 (defun handle-face-up-cards (player game)
   (buy-third-bean-field player game)
-  (plant-card player (pop (player-faceup player)) game)
-  (plant-card player (pop (player-faceup player)) game))
+  (if (all-contains-bean? (first (player-faceup player)))
+      (progn
+	(plant-card player (pop (player-faceup player)) game)
+	(plant-card player (pop (player-faceup player)) game))
+    (progn
+      (plant-card player (pop (reverse (player-faceup player))) game)
+      (plant-card player (pop (reverse (player-faceup player))) game))))
 
 ;;; returns true if the player has three fields, null if only two
 (defun third-field? (player)
@@ -43,6 +50,19 @@
 (defun contains-bean? (bean field)
   (eq bean (car field)))
 
+;;; returns true if any field contains the given bean, null if not
+(defun all-contains-bean? (card player)
+  (cond
+   ((contains-bean? card (first (player-fields player)))
+    t)
+   ((contains-bean? card (second (player-fields player)))
+    t)
+   ((and
+     (third-field? player)
+     (contains-bean? card (third (player-fields player))))
+    t)
+   (t nil)))
+
 ;;; attempts to plant a card in a field that already has the given card,
 ;;; returns null if it can't
 (defun plant-in-occupied-field (player card)
@@ -51,7 +71,9 @@
     (plant card player 0))
    ((contains-bean? card (second (player-fields player)))
     (plant card player 1))
-   ((contains-bean? card (third (player-fields player)))
+   ((and
+     (third-field? player)
+     (contains-bean? card (third (player-fields player))))
     (plant card player 2))))
 
 ;;; attempts to plant a card in an empty field, returns null if there are none

@@ -34,13 +34,14 @@
 ;;; each card in play
 (defun handle-face-up-cards (player game)
   (buy-third-bean-field player game)
-  (if (all-contains-bean? (first (player-faceup player)))
+  (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
 	(plant-card player (pop (player-faceup player)) game)
 	(plant-card player (pop (player-faceup player)) game))
     (progn
-      (plant-card player (pop (reverse (player-faceup player))) game)
-      (plant-card player (pop (reverse (player-faceup player))) game))))
+      (nreverse (player-faceup player))
+      (plant-card player (pop (player-faceup player)) game)
+      (plant-card player (pop (player-faceup player)) game))))
 
 ;;; returns true if the player has three fields, null if only two
 (defun third-field? (player)

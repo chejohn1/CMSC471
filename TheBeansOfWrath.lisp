@@ -46,7 +46,7 @@
 	 (worth-planting? player))
 	 (plant-card player (pop (player-hand player)) game)))
 
-;;;Reutns true if harvesting any field yields coins
+;;; returns true if harvesting any field yields coins
 (defun worth-harvesting? (player)
   (setf legal-fields (player-fields player))
   (loop for x from 0 to 2 do
@@ -59,11 +59,14 @@
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
 (defun handle-face-up-cards (player game)
+  ;; attempts to buy a third bean field
   (buy-third-bean-field player game)
+  ;; if the first face-up card already exists in a given field, plant it first
   (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
 	(plant-card player (pop (player-faceup player)) game)
 	(plant-card player (pop (player-faceup player)) game))
+    ;; otherwise, plant the other card first
     (progn
       (nreverse (player-faceup player))
       (plant-card player (pop (player-faceup player)) game)
@@ -104,7 +107,7 @@
    (t nil)))
 
 ;;; attempts to plant a card in a field that already has the given card,
-;;; returns null if it can't
+;;; returns nil if it can't
 (defun plant-in-occupied-field (player card)
   (cond
    ((contains-bean? card (first (player-fields player)))
@@ -116,7 +119,7 @@
      (contains-bean? card (third (player-fields player))))
     (plant card player 2))))
 
-;;; attempts to plant a card in an empty field, returns null if there are none
+;;; attempts to plant a card in an empty field, returns nil if there are none
 (defun plant-in-empty-field (player card)
   (cond
    ((is-empty? (first (player-fields player)))
@@ -128,9 +131,9 @@
      (is-empty? (third (player-fields player))))
     (plant card player 2))))
 
-;;;Utility Function for choosing the best field to harvest based on the amount
-;;;of coins gained from that harvest. If all harvest values are the same the 
-;;;first field is harvested.
+;;; Utility Function for choosing the best field to harvest based on the amount
+;;; of coins gained from that harvest. If all harvest values are the same the 
+;;; first field is harvested.
 (defun best-field-to-harvest (player)
   (setf legal-fields (player-fields player))
   (setf most-coins 0)
@@ -153,7 +156,7 @@
   best)
 
 
-;;Returns the number of a given card value in the player's hand
+;;; Returns the number of a given card value in the player's hand
 (defun how-many-in-hand (player card)
   (length
   (remove-if-not #'(lambda (x) (equal x card)) (player hand)))

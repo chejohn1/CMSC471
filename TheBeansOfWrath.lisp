@@ -48,7 +48,7 @@
 
 
 (defun worth-planting? (player)
-  (setf current-best-field (best-field-to-harvest player))
+  (setf current-best-field (nth (best-field-to-harvest player) (player-fields player)))
   (setf new-field nil)
   (setf card (car (player-hand player)))
   (setf num-in-hand (how-many-in-hand player card))
@@ -56,7 +56,7 @@
 	(cons card new-field))
   (if (> (harvest-rate new-field) (harvest-rate current-best-field))
       t
-    (nil)))
+    nil))
 
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play

@@ -108,14 +108,26 @@
     (plant card player 2))))
 
 ;;;Utility Function for choosing the best field to harvest based on the amount
-;;;of coins gained from that harvest
+;;;of coins gained from that harvest. If all harvest values are the same the 
+;;;first field is harvested.
 (defun best-field-to-harvest (player)
   (setf legal-fields (player-fields player))
   (setf most-coins 0)
+  (setf most-cards 0)
   (setf best 0)
   (loop for x from 0 to 2 do
 	(if (> (harvest-rate (nth x legal-fields)) most-coins)
 	    (progn
                (setf most-coins (harvest-rate (nth x legal-fields)))
-               (setf best x))))
+               (setf best x))
+	  (progn
+	    (if (eq (harvest-rate (nth x legal-fields)) most-coins)
+		(if (< (length (nth x legal-fields)) (length (nth best legal-fields)))
+		    (progn
+		      (if (eq x 2)
+			  (if (third-field? player)
+			      (setf best x))
+			(setf best x))))))))
+       
   best)
+

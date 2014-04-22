@@ -29,11 +29,12 @@
 
 (defun optionally-plant-card (player game)
   (buy-third-bean-field player game)
-  (if (or
-       (all-contains-bean? (car (player-hand player)) player)
-       (all-is-empty? player))
-       ; UTILITY FUNCTION CODE HERE)
-       (plant-card player (pop (player-hand player)) game)))
+  (when (or
+	 (all-contains-bean? (car (player-hand player)) player)
+	 (all-is-empty? player)
+	 ; UTILITY FUNCTION CODE HERE
+	 )
+	 (plant-card player (pop (player-hand player)) game)))
 
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play

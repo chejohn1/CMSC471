@@ -32,9 +32,7 @@
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
-	 ;;(> (worth-harvesting
-	 ;;   (utili
-	 )
+	 (worth-planting? player))
 	 (plant-card player (pop (player-hand player)) game)))
 
 ;;;Reutns true if harvesting any field yields coins
@@ -149,4 +147,3 @@
   (length
   (remove-if-not #'(lambda (x) (equal x card)) (player hand)))
 )
-

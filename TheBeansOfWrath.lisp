@@ -29,7 +29,11 @@
 
 (defun optionally-plant-card (player game)
   (buy-third-bean-field player game)
-  (plant-card player (pop (player-hand player)) game))
+  (if (or
+       (all-contains-bean? (car (player-hand player)) player)
+       (all-is-empty? (car (player-hand player)) player)
+       ; UTILITY FUNCTION CODE HERE)
+       (plant-card player (pop (player-hand player)) game))))
 
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
@@ -44,15 +48,15 @@
       (plant-card player (pop (player-faceup player)) game)
       (plant-card player (pop (player-faceup player)) game))))
 
-;;; returns true if the player has three fields, null if only two
+;;; returns true if the player has three fields, nil if only two
 (defun third-field? (player)
   (eq (player-numfields player) 3))
 
-;;; returns true if the field contains the given bean, null if not
+;;; returns true if the field contains the given bean, nil if not
 (defun contains-bean? (bean field)
   (eq bean (car field)))
 
-;;; returns true if any field contains the given bean, null if not
+;;; returns true if any field contains the given bean, nil if not
 (defun all-contains-bean? (card player)
   (cond
    ((contains-bean? card (first (player-fields player)))
@@ -62,6 +66,19 @@
    ((and
      (third-field? player)
      (contains-bean? card (third (player-fields player))))
+    t)
+   (t nil)))
+
+;;; returns true if any field is empty, nil if not
+(defun all-is-empty? (card player)
+  (cond
+   ((is-empty? card (first (player-fields player)))
+    t)
+   ((is-empty? card (second (player-fields player)))
+    t)
+   ((and
+     (third-field? player)
+     (is-empty? card (third (player-fields player))))
     t)
    (t nil)))
 

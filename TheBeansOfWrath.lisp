@@ -15,23 +15,35 @@
 	  user::is-singleton? user::is-multiple? user::is-empty?
 	  user::is-planted?))
 
+;;; decides the best course of action for planting a card
 (defun plant-card (player card game)
+  ;; attempt to buy a third bean field
   (buy-third-bean-field player game)
   (cond
+   ;; if there is no card, do nothing
    ((null card))
+   ;; if there is a field that is occupied by the given card, plant
+   ;; the card there
    ((plant-in-occupied-field player card))
+   ;; if there is an empty field, plant the card there
    ((plant-in-empty-field player card))
+   ;; otherwise, choose a best field to harvest and plant the card there
    (t
     (progn
       (setf best-field (best-field-to-harvest player))
       (harvest player best-field game)
       (plant card player best-field)))))
 
+;;; decides whether or not to plant optional card
 (defun optionally-plant-card (player game)
+  ;; attempt to buy a third bean field
   (buy-third-bean-field player game)
+  ;; plant the card if there is a field that contains it, if there is an
+  ;; empty field, or if it's worth planting based on a utility function
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
+<<<<<<< HEAD
 	 (worth-harvesting? player))
 	 ;;(> (worth-harvesting? player)
 	    ;;(utility 
@@ -56,17 +68,33 @@
       (progn
 	t
 	(return)))
+=======
+	 (worth-planting? player))
+	 (plant-card player (pop (player-hand player)) game)))
+
+;;; returns true if harvesting any field yields coins
+(defun worth-harvesting? (player)
+  (setf legal-fields (player-fields player))
+  (loop for x from 0 to 2 do
+	(if (> (harvest-rate (nth x legal-fields)) 0)
+	    (progn
+	      (t)
+	      (return))))
+>>>>>>> cc1a0845dd34407708c33c4bcb8c3090b47f5808
   nil)
 
 
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
 (defun handle-face-up-cards (player game)
+  ;; attempts to buy a third bean field
   (buy-third-bean-field player game)
+  ;; if the first face-up card already exists in a given field, plant it first
   (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
 	(plant-card player (pop (player-faceup player)) game)
 	(plant-card player (pop (player-faceup player)) game))
+    ;; otherwise, plant the other card first
     (progn
       (nreverse (player-faceup player))
       (plant-card player (pop (player-faceup player)) game)
@@ -107,7 +135,7 @@
    (t nil)))
 
 ;;; attempts to plant a card in a field that already has the given card,
-;;; returns null if it can't
+;;; returns nil if it can't
 (defun plant-in-occupied-field (player card)
   (cond
    ((contains-bean? card (first (player-fields player)))
@@ -119,7 +147,7 @@
      (contains-bean? card (third (player-fields player))))
     (plant card player 2))))
 
-;;; attempts to plant a card in an empty field, returns null if there are none
+;;; attempts to plant a card in an empty field, returns nil if there are none
 (defun plant-in-empty-field (player card)
   (cond
    ((is-empty? (first (player-fields player)))
@@ -131,9 +159,9 @@
      (is-empty? (third (player-fields player))))
     (plant card player 2))))
 
-;;;Utility Function for choosing the best field to harvest based on the amount
-;;;of coins gained from that harvest. If all harvest values are the same the 
-;;;first field is harvested.
+;;; Utility Function for choosing the best field to harvest based on the amount
+;;; of coins gained from that harvest. If all harvest values are the same the 
+;;; first field is harvested.
 (defun best-field-to-harvest (player)
   (setf legal-fields (player-fields player))
   (setf most-coins 0)
@@ -155,3 +183,12 @@
        
   best)
 
+<<<<<<< HEAD
+=======
+
+;;; Returns the number of a given card value in the player's hand
+(defun how-many-in-hand (player card)
+  (length
+  (remove-if-not #'(lambda (x) (equal x card)) (player hand)))
+)
+>>>>>>> cc1a0845dd34407708c33c4bcb8c3090b47f5808

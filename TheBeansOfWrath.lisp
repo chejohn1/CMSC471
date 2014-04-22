@@ -32,8 +32,8 @@
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
-	 ; UTILITY FUNCTION CODE HERE
-	 )
+	 (> (worth-harvesting
+	    (utility 
 	 (plant-card player (pop (player-hand player)) game)))
 
 ;;;Reutns true if harvesting any field yields coins
@@ -142,3 +142,5 @@
        
   best)
 
+(defun how-many-in-hand (player card)
+  (

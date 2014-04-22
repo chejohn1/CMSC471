@@ -51,10 +51,10 @@
   (setf current-best-field (best-field-to-harvest player))
   (setf new-field nil)
   (setf card (car (player-hand player)))
-  (setf num-in-hand (how-many-in-hand? (player card)))
+  (setf num-in-hand (how-many-in-hand player card))
   (loop for i from 0 to num-in-hand do
 	(cons card new-field))
-  (if (> (harvest-rate newfield) (harvest-rate current-best-field))
+  (if (> (harvest-rate new-field) (harvest-rate current-best-field))
       t
     (nil)))
 
@@ -162,5 +162,5 @@
 ;;; Returns the number of a given card value in the player's hand
 (defun how-many-in-hand (player card)
   (length
-  (remove-if-not #'(lambda (x) (equal x card)) (player hand)))
+  (remove-if-not #'(lambda (x) (equal x card)) (player-hand player)))
 )

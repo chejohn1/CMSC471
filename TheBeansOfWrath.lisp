@@ -43,9 +43,7 @@
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
-	 (worth-harvesting? player))
-	 ;;(> (worth-harvesting? player)
-	    ;;(utility 
+	 (worth-planting? player))
 	 (plant-card player (pop (player-hand player)) game)))
 
 

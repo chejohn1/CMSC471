@@ -73,10 +73,6 @@
     (plant card player 0))
    ((contains-bean? card (second (player-fields player)))
     (plant card player 1))
-
-   ((contains-bean? card (third (player-fields player)))
-     (plant card player 2))))
-
    ((and
      (third-field? player)
      (contains-bean? card (third (player-fields player))))

@@ -37,6 +37,16 @@
 	 )
 	 (plant-card player (pop (player-hand player)) game)))
 
+;;;Reutns true if harvesting any field yields coins
+(defun worth-harvesting? (player)
+  (setf legal-fields (player-fields player))
+  (loop for x from 0 to 2 do
+	(if (> (harvest-rate (nth x legal-fields)) 0)
+	    (progn
+	      (t)
+	      (return))))
+  nil)
+
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
 (defun handle-face-up-cards (player game)

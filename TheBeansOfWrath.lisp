@@ -18,7 +18,7 @@
 ;;; decides the best course of action for planting a card
 (defun plant-card (player card game)
   ;; attempt to buy a third bean field
-  (buy-third-bean-field player game)
+  (possibly-buy-third-bean-field player game)
   (cond
    ;; if there is no card, do nothing
    ((null card))
@@ -37,7 +37,7 @@
 ;;; decides whether or not to plant optional card
 (defun optionally-plant-card (player game)
   ;; attempt to buy a third bean field
-  (buy-third-bean-field player game)
+  (possibly-buy-third-bean-field player game)
   ;; plant the card if there is a field that contains it, if there is an
   ;; empty field, or if it's worth planting based on a utility function
   (when (or
@@ -64,7 +64,7 @@
 ;;; each card in play
 (defun handle-face-up-cards (player game)
   ;; attempts to buy a third bean field
-  (buy-third-bean-field player game)
+  (possibly-buy-third-bean-field player game)
   ;; if the first face-up card already exists in a given field, plant it first
   (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
@@ -75,6 +75,12 @@
       (nreverse (player-faceup player))
       (plant-card player (pop (player-faceup player)) game)
       (plant-card player (pop (player-faceup player)) game))))
+
+;;; buys third bean field if it hasn't already been bought and the deck has
+;;; been shuffled less than 3 times
+(defun possibly-buy-third-bean-field (player game)
+  (when (< (game-shuffles game) 3)
+    (buy-third-bean-field player game)))
 
 ;;; returns true if the player has three fields, nil if only two
 (defun third-field? (player)

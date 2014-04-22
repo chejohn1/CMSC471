@@ -46,12 +46,14 @@
 	 (worth-planting? player))
 	 (plant-card player (pop (player-hand player)) game)))
 
-
+;;;Returns true if it is possible for the top card to gain more coins than 
+;;;the current worst field with only the cards in the player's hand
 (defun worth-planting? (player)
   (setf current-best-field (nth (best-field-to-harvest player) (player-fields player)))
   (setf new-field nil)
   (setf card (car (player-hand player)))
   (setf num-in-hand (how-many-in-hand player card))
+  ;;Populate the new field state and compare with current field states
   (loop for i from 0 to num-in-hand do
 	(cons card new-field))
   (if (> (harvest-rate new-field) (harvest-rate current-best-field))

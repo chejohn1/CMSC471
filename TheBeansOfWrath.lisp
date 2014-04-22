@@ -144,4 +144,4 @@
   best)
 
 (defun how-many-in-hand (player card)
-  (
+  ())

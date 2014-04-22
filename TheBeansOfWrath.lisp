@@ -72,15 +72,14 @@
     (plant card player 0))
    ((contains-bean? card (second (player-fields player)))
     (plant card player 1))
-<<<<<<< HEAD
+
    ((contains-bean? card (third (player-fields player)))
      (plant card player 2))))
-=======
+
    ((and
      (third-field? player)
      (contains-bean? card (third (player-fields player))))
     (plant card player 2))))
->>>>>>> origin
 
 ;;; attempts to plant a card in an empty field, returns null if there are none
 (defun plant-in-empty-field (player card)

@@ -32,19 +32,32 @@
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
-	 (> (worth-harvesting
-	    (utility 
+	 (worth-harvesting? player))
+	 ;;(> (worth-harvesting? player)
+	    ;;(utility 
 	 (plant-card player (pop (player-hand player)) game)))
 
+
+(defun worth-planting? (player)
+  (setf current-best-field (best-field-to-harvest player))
+  (setf new-field nil)
+  (setf card (car (player-hand player)))
+  (setf num-in-hand how-many-in-hand? (player card))
+  (loop for i from 0 to num-in-hand do
+	(cons card new-field))
+  (if (> (harvest-rate newfield) (harvest-rate current-best-field))
+      t
+    (nil)))
+  
+
 ;;;Reutns true if harvesting any field yields coins
-(defun worth-harvesting? (player)
-  (setf legal-fields (player-fields player))
-  (loop for x from 0 to 2 do
-	(if (> (harvest-rate (nth x legal-fields)) 0)
-	    (progn
-	      (t)
-	      (return))))
+(defun worth-harvesting? (field)
+  (if (> (harvest-rate (field)) 0)
+      (progn
+	t
+	(return)))
   nil)
+
 
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
@@ -142,5 +155,3 @@
        
   best)
 
-(defun how-many-in-hand (player card)
-  (

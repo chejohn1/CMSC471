@@ -78,7 +78,6 @@
 	    (progn
 	      (t)
 	      (return))))
->>>>>>> cc1a0845dd34407708c33c4bcb8c3090b47f5808
   nil)
 
 
@@ -181,12 +180,10 @@
        
   best)
 
-<<<<<<< HEAD
-=======
+
 
 ;;; Returns the number of a given card value in the player's hand
 (defun how-many-in-hand (player card)
   (length
   (remove-if-not #'(lambda (x) (equal x card)) (player hand)))
 )
->>>>>>> cc1a0845dd34407708c33c4bcb8c3090b47f5808

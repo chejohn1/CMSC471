@@ -15,20 +15,31 @@
 	  user::is-singleton? user::is-multiple? user::is-empty?
 	  user::is-planted?))
 
+;;; decides the best course of action for planting a card
 (defun plant-card (player card game)
+  ;; attempt to buy a third bean field
   (buy-third-bean-field player game)
   (cond
+   ;; if there is no card, do nothing
    ((null card))
+   ;; if there is a field that is occupied by the given card, plant
+   ;; the card there
    ((plant-in-occupied-field player card))
+   ;; if there is an empty field, plant the card there
    ((plant-in-empty-field player card))
+   ;; otherwise, choose a best field to harvest and plant the card there
    (t
     (progn
       (setf best-field (best-field-to-harvest player))
       (harvest player best-field game)
       (plant card player best-field)))))
 
+;;; decides whether or not to plant optional card
 (defun optionally-plant-card (player game)
+  ;; attempt to buy a third bean field
   (buy-third-bean-field player game)
+  ;; plant the card if there is a field that contains it, if there is an
+  ;; empty field, or if it's worth planting based on a utility function
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)

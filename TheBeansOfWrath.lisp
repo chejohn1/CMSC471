@@ -107,6 +107,8 @@
      (is-empty? (third (player-fields player))))
     (plant card player 2))))
 
+;;;Utility Function for choosing the best field to harvest based on the amount
+;;;of coins gained from that harvest
 (defun best-field-to-harvest (player)
   (setf legal-fields (player-fields player))
   (setf most-coins 0)
@@ -114,6 +116,6 @@
   (loop for x from 0 to 2 do
 	(if (> (harvest-rate (nth x legal-fields)) most-coins)
 	    (progn
-               (setf most-coins (harvest-rate (nth x  legal-fields)))
+               (setf most-coins (harvest-rate (nth x legal-fields)))
                (setf best x))))
   best)

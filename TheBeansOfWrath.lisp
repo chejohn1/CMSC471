@@ -79,7 +79,9 @@
 ;;; buys third bean field if it hasn't already been bought and the deck has
 ;;; been shuffled less than 3 times
 (defun possibly-buy-third-bean-field (player game)
-  (when (< (game-shuffles game) 3)
+  (when (or
+	 (eq (list-length (game-players game)) 2)
+	 (< (game-shuffles game) 3))
     (buy-third-bean-field player game)))
 
 ;;; returns true if the player has three fields, nil if only two

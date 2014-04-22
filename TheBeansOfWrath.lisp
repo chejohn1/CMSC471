@@ -43,7 +43,6 @@
   (when (or
 	 (all-contains-bean? (car (player-hand player)) player)
 	 (all-is-empty? player)
-<<<<<<< HEAD
 	 (worth-harvesting? player))
 	 ;;(> (worth-harvesting? player)
 	    ;;(utility 
@@ -68,7 +67,6 @@
       (progn
 	t
 	(return)))
-=======
 	 (worth-planting? player))
 	 (plant-card player (pop (player-hand player)) game)))
 

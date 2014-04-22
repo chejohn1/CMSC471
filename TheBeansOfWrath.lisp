@@ -143,5 +143,10 @@
        
   best)
 
+
+;;Returns the number of a given card value in the player's hand
 (defun how-many-in-hand (player card)
-  ())
+  (length
+  (remove-if-not #'(lambda (x) (equal x card)) (player hand)))
+)
+

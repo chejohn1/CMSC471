@@ -23,8 +23,9 @@
    ((plant-in-empty-field player card))
    (t
     (progn
-      (harvest player 0 game)
-      (plant card player 0)))))
+      (setf best-field (best-field-to-harvest player))
+      (harvest player best-field game)
+      (plant card player best-field)))))
 
 (defun optionally-plant-card (player game)
   (buy-third-bean-field player game)
@@ -72,6 +73,10 @@
     (plant card player 0))
    ((contains-bean? card (second (player-fields player)))
     (plant card player 1))
+
+   ((contains-bean? card (third (player-fields player)))
+     (plant card player 2))))
+
    ((and
      (third-field? player)
      (contains-bean? card (third (player-fields player))))
@@ -88,3 +93,14 @@
      (third-field? player)
      (is-empty? (third (player-fields player))))
     (plant card player 2))))
+
+(defun best-field-to-harvest (player)
+  (setf legal-fields (player-fields player))
+  (setf most-coins 0)
+  (setf best 0)
+  (loop for x from 0 to 2 do
+	(if (> (harvest-rate (nth x legal-fields)) most-coins)
+	    (progn
+               (setf most-coins (harvest-rate (nth x  legal-fields)))
+               (setf best x))))
+  best)

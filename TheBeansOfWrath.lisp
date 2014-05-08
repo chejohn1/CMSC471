@@ -1,19 +1,24 @@
 (defpackage :TheBeansOfWrath)
 (in-package :TheBeansOfWrath)
 
-(import '(user::BeanTypes 
+
+(import '(user::BeanTypes
 	  user::BeanConversion
-	  user::game-deck-stats user::game-discards user::game-discard-stats 
-	  user::game-coin-stats user::game-players user::game-rounds 
+	  user::game-deck-stats user::game-discards user::game-discard-stats
+	  user::game-coin-stats user::game-players user::game-rounds
 	  user::game-shuffles
 	  user::player-name user::player-hand user::player-faceup
 	  user::player-numfields user::player-fields user::player-coins
 	  user::player-coin-stack
+	  user::trade-from-player user::trade-from-card user::trade-from-pos
+	  user::trade-from-score
+	  user::trade-to-player user::trade-to-card user::trade-to-pos
+	  user::trade-to-score user::trade-info
 	  user::plant user::harvest user::bean-fits
 	  user::legal-fields-to-harvest user::plant-card-at-front
 	  user::harvest-rate user::buy-third-bean-field
 	  user::is-singleton? user::is-multiple? user::is-empty?
-	  user::is-planted?))
+	  user::is-planted? user::trade user::viable-trade))
 
 ;;; decides the best course of action for planting a card
 (defun plant-card (player card game)
@@ -66,6 +71,9 @@
   ;; attempts to buy a third bean field
   (possibly-buy-third-bean-field player game)
   ;; if the first face-up card already exists in a given field, plant it first
+
+  (trade (generate-trades player) player)
+
   (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
 	(plant-card player (pop (player-faceup player)) game)
@@ -147,23 +155,24 @@
 ;;; of coins gained from that harvest. If all harvest values are the same the 
 ;;; first field is harvested.
 (defun best-field-to-harvest (player)
-  (setf legal-fields (player-fields player))
+  (setf fields (player-fields player))
+  (setf legal-fields (legal-fields-to-harvest fields))
   (setf most-coins 0)
   (setf most-cards 0)
-  (setf best 0)
-  (loop for x from 0 to 2 do
-	(if (> (harvest-rate (nth x legal-fields)) most-coins)
+  (setf best (car legal-fields))
+  (loop for x in legal-fields do
+	(if (> (harvest-rate (nth x fields)) most-coins)
 	    (progn
-               (setf most-coins (harvest-rate (nth x legal-fields)))
+               (setf most-coins (harvest-rate (nth x fields)))
                (setf best x))
 	  (progn
-	    (if (eq (harvest-rate (nth x legal-fields)) most-coins)
-		(if (< (length (nth x legal-fields)) (length (nth best legal-fields)))
+	    (if (eq (harvest-rate (nth x fields)) most-coins)
+		(if (< (length (nth x fields)) (length (nth best fields)))
 		    (progn
 		      (if (eq x 2)
 			  (if (third-field? player)
 			      (setf best x))
-			(setf best x))))))))
+			(setf best best))))))))
        
   best)
 
@@ -174,3 +183,44 @@
   (length
   (remove-if-not #'(lambda (x) (equal x card)) (player-hand player)))
 )
+
+
+
+(defun generate-trades (player &aux (trades nil) desired-cards)
+  (setf desired-cards
+	(remove-if #'null (mapcar #'car (player-fields player))))
+  (loop for card in (player-faceup player)
+	do (if (not (member card desired-cards))
+	       (setf trades (append trades
+				    (make-new-trades
+				     player 'player-faceup card
+				     desired-cards 1)))))
+  (loop for i from 0 to (length (player-hand player))
+	do (if (not (member (nth i (player-hand player)) desired-cards))
+	       (setf trades (append trades
+				    (make-new-trades
+				     player i (nth i (player-hand player))
+				     desired-cards (/ 1 (+ 1 i)))))))
+  trades
+  )
+
+(defun make-new-trades (player loc bad goods value)
+  (loop for card in goods
+	collect (make-instance 'trade :from-player player
+			       :from-card bad
+			       :from-pos loc
+			       :from-score value
+			       :to-card card
+			       :info nil)))
+
+
+(defun evaluate-trades (player trades)
+  (loop for trade in trades
+	do (if (trade-to-card trade)
+	       (let ((viable (viable-trade player trade)))
+		 (if viable
+		     (push (list player 1 (car viable))
+			   (trade-info trade))
+		   (push (list player 0) (trade-info trade))))
+	     (push (list player 1) (trade-info trade))))
+  )

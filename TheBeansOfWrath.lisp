@@ -153,7 +153,7 @@
 
 ;;; Utility Function for choosing the best field to harvest based on the amount
 ;;; of coins gained from that harvest. If all harvest values are the same the 
-;;; first field is harvested.
+;;; first legal field is harvested.
 (defun best-field-to-harvest (player)
   (setf fields (player-fields player))
   (setf legal-fields (legal-fields-to-harvest fields))
@@ -161,11 +161,25 @@
   (setf most-cards 0)
   (setf best (car legal-fields))
   (loop for x in legal-fields do
+	;; Check best harvest rate of fields
 	(if (> (harvest-rate (nth x fields)) most-coins)
 	    (progn
                (setf most-coins (harvest-rate (nth x fields)))
-               (setf best x))
+	       ;; Check if card type in field is in player hand
+	       ;; If it is not then choose that field as best field
+	       (if (member (car (nth x fields)) (player-hand player))
+		   (progn
+		     (setf num-in-hand (how-many-in-hand player (car (nth x fields))))
+		     (setf new-field (nth x fields))
+		     (loop for i from 0 to num-in-hand do
+			   (setf new-field (cons (car (nth x fields)) new-field)))
+		     (if (> (harvest-rate new-field)  most-coins)
+			 (setf best best)
+		       (setf best x))
+		     (setf best x))))
+
 	  (progn
+	    ;; Choose smallest field in case of same harvest-rates
 	    (if (eq (harvest-rate (nth x fields)) most-coins)
 		(if (< (length (nth x fields)) (length (nth best fields)))
 		    (progn
@@ -195,12 +209,20 @@
 				    (make-new-trades
 				     player 'player-faceup card
 				     desired-cards 1)))))
-  (loop for i from 0 to (length (player-hand player))
-	do (if (not (member (nth i (player-hand player)) desired-cards))
+  (loop for cardPos from 0 to (length (player-hand player))
+	do (if (not (member (nth cardPos (player-hand player)) desired-cards))
 	       (setf trades (append trades
 				    (make-new-trades
-				     player i (nth i (player-hand player))
-				     desired-cards (/ 1 (+ 1 i)))))))
+				     player cardPos (nth cardPos (player-hand player))
+				     desired-cards (/ 1 (+ 1 cardPos)))))
+	     ;; If card type in field and more than 1 trade
+	     ;; consider trading with a reduced score.
+	     (if (> (length trades) 1)
+		 (setf trades (append trades
+				      (make-new-trades
+				       player cardPos (nth cardPos (player-hand player))
+				       desired-cards (/ 1 (* 4 (+ 1 cardPos)))))))))
+  
   trades
   )
 
@@ -222,5 +244,6 @@
 		     (push (list player 1 (car viable))
 			   (trade-info trade))
 		   (push (list player 0) (trade-info trade))))
-	     (push (list player 1) (trade-info trade))))
+	     ;;Always reject donated cards
+	     (push (list player 0) (trade-info trade))))
   )

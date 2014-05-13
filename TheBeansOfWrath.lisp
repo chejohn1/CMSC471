@@ -68,11 +68,14 @@
 ;;; plants face-up cards based on if there is already a field containing
 ;;; each card in play
 (defun handle-face-up-cards (player game)
+
+  ;; Handle trading away cards that cannot be planted
+  (trade (generate-trades player) player)
+
   ;; attempts to buy a third bean field
   (possibly-buy-third-bean-field player game)
   ;; if the first face-up card already exists in a given field, plant it first
 
-  (trade (generate-trades player) player)
 
   (if (all-contains-bean? (first (player-faceup player)) player)
       (progn
@@ -199,7 +202,7 @@
 )
 
 
-
+;;;Generates a list of trades with associated trade away values
 (defun generate-trades (player &aux (trades nil) desired-cards)
   (setf desired-cards
 	(remove-if #'null (mapcar #'car (player-fields player))))
@@ -209,28 +212,30 @@
 				    (make-new-trades
 				     player 'player-faceup card
 				     desired-cards 1)))))
-  (loop for cardPos from 0 to (length (player-hand player))
+  (loop for cardPos from 0 to (- (length (player-hand player)) 1)
+	;; If card cannot be plannted immediately try to trade it.
 	do (if (not (member (nth cardPos (player-hand player)) desired-cards))
 	       (setf trades (append trades
 				    (make-new-trades
 				     player cardPos (nth cardPos (player-hand player))
 				     desired-cards (/ 1 (+ 1 cardPos)))))
-	     ;; If card type in field and more than 1 trade
-	     ;; consider trading with a reduced score.
-	     (if (> (length trades) 1)
+	     (if (> (length trades) 0)
+		 ;;If card can be planted immediately score trade with heavy penalty depending on position in hand
+		 ;;(i.e. cards that can be planted have a higher score if they are farther back in the hand)
 		 (setf trades (append trades
 				      (make-new-trades
 				       player cardPos (nth cardPos (player-hand player))
-				       desired-cards (/ 1 (* 4 (+ 1 cardPos)))))))))
-  
+				       desired-cards (/ 1 (* 10 (+ 1 (- (- (length (player-hand player)) 1) cardPos))))))))))
+       
   trades
-  )
+)
 
-(defun make-new-trades (player loc bad goods value)
-  (loop for card in goods
+;;; Makes instance of trades and returns a list of trades for each card in desired
+(defun make-new-trades (player location give-away desired value)
+  (loop for card in desired
 	collect (make-instance 'trade :from-player player
-			       :from-card bad
-			       :from-pos loc
+			       :from-card give-away
+			       :from-pos location
 			       :from-score value
 			       :to-card card
 			       :info nil)))
@@ -241,9 +246,9 @@
 	do (if (trade-to-card trade)
 	       (let ((viable (viable-trade player trade)))
 		 (if viable
-		     (push (list player 1 (car viable))
-			   (trade-info trade))
+		     (push (list player (/ 1 (+ 1 (car (reverse viable)))) (car viable))
+			   (trade-info trade)))
 		   (push (list player 0) (trade-info trade))))
 	     ;;Always reject donated cards
-	     (push (list player 0) (trade-info trade))))
-  )
+	     (push (list player 0) (trade-info trade)))
+)

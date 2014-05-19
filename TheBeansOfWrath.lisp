@@ -240,12 +240,13 @@
 			       :to-card card
 			       :info nil)))
 
-
+;;; Scores trades for cards to recieve.
 (defun evaluate-trades (player trades)
   (loop for trade in trades
 	do (if (trade-to-card trade)
 	       (let ((viable (viable-trade player trade)))
 		 (if viable
+		 ;;If the trade is viable score based on the pos in hand in the viable list.
 		     (push (list player (/ 1 (+ 1 (car (reverse viable)))) (car viable))
 			   (trade-info trade)))
 		   (push (list player 0) (trade-info trade))))
